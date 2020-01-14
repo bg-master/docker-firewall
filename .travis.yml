@@ -1,0 +1,10 @@
+sudo: required
+services:
+  - docker
+
+script:
+  - docker build --tag bgdevit/docker-firewall .
+  - docker run bgdevit/docker-firewall
+
+after_script:
+  - docker images
