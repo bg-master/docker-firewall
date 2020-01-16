@@ -1,3 +1,6 @@
+os: linux
+language: shell
+
 env:
   global:
     - IMAGE_NAME=bgdevit/docker-firewall
@@ -6,11 +9,20 @@ env:
 jobs:
   include:
     - stage: "Build Docker image"
-      name: "build-amd64"
       arch: amd64
       os: linux
-      language: minimal
+      language: shell
       services: docker
       script:
-        - docker build  --tag "$IMAGE_NAME" .
+        - docker build --tag "$IMAGE_NAME" .
         - docker images
+
+    - stage: "Add tag"
+      arch: amd64
+      os: linux
+      language: shell
+      services: docker
+      script:
+        - git_sha="$(git rev-parse --short HEAD)"
+        - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:develop"
+        - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-develop"
