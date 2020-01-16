@@ -1,26 +1,16 @@
-services: docker
-language: python
-
 env:
   global:
   - IMAGE_NAME=bgdevit/docker-firewall
   - REGISTRY_USER=bgdevitrobot
 
-before_install:
-- pip install docker-ci-deploy
-
-before_script:
-- docker pull "$IMAGE_NAME" || true
-script:
-- docker build --pull --cache-from "$IMAGE_NAME" --tag "$IMAGE_NAME" .
-after_script:
-- docker images
-
-before_deploy:
-- docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
-deploy:
-  provider: script
-  script: dcd --dry-run --tag "$(git rev-parse --short HEAD)" --tag latest "$IMAGE_NAME"
-  on:
-    branch: develop
-    
+jobs:
+  include:
+  - stage: "Build Docker image"
+      name: "build-amd64"
+      arch: amd64
+      os: linux
+      language: minimal
+      services: docker
+      script:
+      - docker build  --tag "$IMAGE_NAME" .
+      - docker images
