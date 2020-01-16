@@ -13,16 +13,11 @@ jobs:
       os: linux
       language: shell
       services: docker
+      before_script:
+        - docker pull "${IMAGE_NAME}:develop" || true
       script:
-        - docker build --tag "$IMAGE_NAME" .
-        - docker images
-
-    - stage: "Add tag"
-      arch: amd64
-      os: linux
-      language: shell
-      services: docker
-      script:
+        - docker build --pull --cache-from "${IMAGE_NAME}:develop" --tag "$IMAGE_NAME" .
         - git_sha="$(git rev-parse --short HEAD)"
         - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:develop"
         - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-develop"
+        - docker images
