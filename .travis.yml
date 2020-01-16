@@ -1,16 +1,16 @@
 env:
   global:
-  - IMAGE_NAME=bgdevit/docker-firewall
-  - REGISTRY_USER=bgdevitrobot
+    - IMAGE_NAME=bgdevit/docker-firewall
+    - REGISTRY_USER=bgdevitrobot
 
 jobs:
   include:
-  - stage: "Build Docker image"
+    - stage: "Build Docker image"
       name: "build-amd64"
       arch: amd64
       os: linux
       language: minimal
       services: docker
       script:
-      - docker build  --tag "$IMAGE_NAME" .
-      - docker images
+        - docker build  --tag "$IMAGE_NAME" .
+        - docker images
