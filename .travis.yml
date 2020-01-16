@@ -1,10 +1,29 @@
-sudo: required
-services:
-  - docker
+services: docker
+language: python
+
+env:
+  global:
+  - IMAGE_NAME=bgdevit/docker-firewall
+  - REGISTRY_USER=bgdevitrobot
+
+before_install:
+- pip install docker-ci-deploy
+
+before_script:
+- docker pull ${IMAGE_NAME} || true
 
 script:
-  - docker build --tag bgdevit/docker-firewall .
-  - docker run bgdevit/docker-firewall
+- docker build --pull --cache-from ${IMAGE_NAME} --tag $IMAGE_NAME .
+#- docker run ${IMAGE_NAME}
 
 after_script:
-  - docker images
+- docker images
+
+before_deploy:
+- echo "Testing Docker Hub credentials"
+- docker login -u=$REGISTRY_USER -p=$REGISTRY_PASS
+- echo "Docker Hub credentials are working"
+
+deploy:
+  provider: script
+  script: docker-ci-deploy --dry-run --tag $(git rev-parse --short HEAD) --tag latest ${IMAGE_NAME}
