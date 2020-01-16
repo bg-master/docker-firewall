@@ -27,3 +27,5 @@ before_deploy:
 deploy:
   provider: script
   script: docker-ci-deploy --dry-run --tag $(git rev-parse --short HEAD) --tag latest ${IMAGE_NAME}
+  on:
+    branch: develop
