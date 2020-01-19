@@ -25,7 +25,7 @@ jobs:
         - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-develop"
       deploy:
         provider: script
-        script: docker push "${IMAGE_NAME}:develop" && docker push "${IMAGE_NAME}:${git_sha}-develop"
+        script: docker push "${IMAGE_NAME}:${git_sha}-develop" && docker push "${IMAGE_NAME}:develop"
         on:
           branch: develop
     - name: "Build main branch"
@@ -44,6 +44,6 @@ jobs:
         - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:0.1.0"
       deploy:
         provider: script
-        script: docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:0.1.0"
+        script: docker push "${IMAGE_NAME}:0.1.0" && docker push "${IMAGE_NAME}:latest"
         on:
           branch: master
