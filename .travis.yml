@@ -4,15 +4,16 @@ language: shell
 env:
   global:
     - IMAGE_NAME=bgdevit/docker-firewall
-    - REGISTRY_USER=bgdevitrobot
 
 jobs:
   include:
     - stage: "Build Docker image"
+      name: "Build develop branch"   
       arch: amd64
       os: linux
       language: shell
       services: docker
+      if: branch = develop AND type != pull_request
       before_script:
         - docker pull "${IMAGE_NAME}:develop" || true
       script:
@@ -27,3 +28,22 @@ jobs:
         script: docker push "${IMAGE_NAME}:develop" && docker push "${IMAGE_NAME}:${git_sha}-develop"
         on:
           branch: develop
+    - name: "Build main branch"
+      arch: amd64
+      os: linux
+      language: shell
+      services: docker
+      if: branch = main AND type != pull_request
+      before_script:
+        - docker pull "$IMAGE_NAME" || true
+      script:
+        - docker build --pull --cache-from "$IMAGE_NAME" --tag "$IMAGE_NAME" .
+      before_deploy:
+        - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
+        - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:latest"
+        - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:0.1.0"
+      deploy:
+        provider: script
+        script: docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:0.1.0"
+        on:
+          branch: master
